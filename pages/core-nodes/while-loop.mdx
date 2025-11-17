@@ -1,0 +1,54 @@
+# While Loop
+
+import { Callout } from 'nextra/components';
+import Image from 'next/image';
+import whileLoop from '/public/nodes/while-loop.png';
+
+The While Loop node lets you **run a block of nodes repeatedly while a condition stays true**. It's handy when the number
+of repetitions depends on runtime data. Unlike the standard Loop node (which iterates over every item in an input array)
+or the Repeat node (which runs a fixed number of times), the While Loop keeps executing until the condition you define
+evaluates to `false`.
+
+<Image src={whileLoop} alt='While Loop node preview' width={1200} />
+
+## When to use the While Loop node
+
+- **Polling / waiting for status changes**: e.g., keep querying an external API until the response contains a terminal
+  state.
+- **Progressive transformations**: apply a set of nodes until the payload satisfies a rule (size threshold, validation,
+  etc.).
+- **Retries with custom logic**: implement exponential backoffs or conditional exits without writing custom scripts.
+
+## Configuring the node
+
+1. **Condition**: Define a boolean expression using the Object Inspector or JSON editor. The loop evaluates this
+   condition before each iteration. If the result is `true`, the loop body runs; otherwise, the loop stops.
+2. **Maximum iterations**: Safeguard against infinite loops by setting an upper limit. The workflow fails with an error
+   if the loop hits the cap before the condition becomes `false`.
+3. **Delay between runs (optional)**: Add a wait time to avoid hammering downstream systems when polling.
+4. **Loop body**: Drag the nodes that should execute each time. They can read/write the workflow context like any other
+   node, so you can update values that the condition depends on.
+
+<Callout emoji='💡'>
+Use workflow variables to store counters, API responses, or merged state inside the loop. Updating those variables lets
+the While Loop condition react to changes without extra scripting.
+</Callout>
+
+## Execution flow
+
+1. Evaluate the condition.
+2. If `true`, run every node in the loop body (top to bottom).
+3. Update any referenced variables/outputs.
+4. Re-run the condition (respecting the optional delay) and repeat the process.
+5. Stop when the condition returns `false` or the max iteration limit is reached.
+
+## Example
+
+Imagine processing invoices until a downstream ERP confirms they are posted:
+
+1. Use an HTTP node inside the loop to check the invoice ID.
+2. If the ERP still reports `pending`, log the status, increment a counter, and sleep for 30 seconds.
+3. When the response switches to `posted`, store the confirmation and let the loop exit automatically.
+
+This pattern prevents unnecessary workflow branches and keeps the logic readable compared to custom scripts.
+

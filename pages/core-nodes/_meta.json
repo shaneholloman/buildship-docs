@@ -3,6 +3,7 @@
   "return": "Output Node (Return)",
   "if-else": "Branch (If Else)",
   "loop": "Loop",
+  "while-loop": "While Loop",
   "parallel": "Parallel",
   "ai-switch": "AI Switch",
   "switch": "Switch",
